@@ -6,7 +6,6 @@ import {
   Aws,
   Duration,
   CfnOutput,
-  CfnMapping,
   Tags,
   aws_iam as iam,
   aws_ec2 as ec2,
@@ -164,22 +163,6 @@ export class Ec2WorkerStack extends Construct {
       {}
     );
 
-    const assetTable = new CfnMapping(this, 'AssetTable', {
-        mapping: {
-            'aws': {
-                assetDomain: 'https://aws-gcr-solutions-assets.s3.amazonaws.com',
-            },
-            'aws-cn': {
-                assetDomain: 'https://aws-gcr-solutions-assets.s3.cn-northwest-1.amazonaws.com.cn',
-            },
-            'aws-us-gov': {
-              assetDomain: 'https://aws-gcr-solutions-assets.s3.amazonaws.com',
-            },
-        }
-    });
-
-    const cliAssetDomain = assetTable.findInMap(Aws.PARTITION, 'assetDomain')
-
     this.workerAsg.applyCloudFormationInit(
       ec2.CloudFormationInit.fromElements(
         ec2.InitFile.fromFileInline(
@@ -204,9 +187,9 @@ export class Ec2WorkerStack extends Construct {
       `sed -i  -e "s/##log group##/${props.ec2LG.logGroupName}/g" cw_agent_config.json`,
       "/opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -c file:/home/ec2-user/cw_agent_config.json -s",
 
-      // Get CLI from solution assets
-      `curl -LO "${props.dthCliUrl ? `${props.dthCliUrl}v${props.cliRelease}/dthcli_${props.cliRelease}_linux_arm64.tar.gz` : `${cliAssetDomain}/data-transfer-hub-cli/v${props.cliRelease}/dthcli_${props.cliRelease}_linux_arm64.tar.gz`}"`,
-      `tar zxvf dthcli_${props.cliRelease}_linux_arm64.tar.gz`,
+      // Get CLI from GitHub Release
+      `curl -LO "https://github.com/crazyoyo/data-transfer-hub-cli/releases/download/v1.0.0/dthcli_1.0.0_linux_arm64.tar.gz"`,
+      `tar zxvf dthcli_1.0.0_linux_arm64.tar.gz`,
 
       // Prepare the environment variables
       `echo "export JOB_TABLE_NAME=${props.env.JOB_TABLE_NAME}" >> env.sh`,

@@ -39,9 +39,10 @@ def lambda_handler(event, _):
     upload_id = args.get("uploadID")
     total_parts_count = int(args.get("totalPartsCount"))
     object_key = args.get('objectKey')
+    dest_object_key = args.get('destObjectKey')
 
     multi_part_helper = MultiPartUploadHelper(
-        upload_id=upload_id, object_key=object_key)
+        upload_id=upload_id, object_key=object_key, dest_object_key=dest_object_key)
 
     # Query all parts under the given upload id,
     # if all parts are transferred, call complete multipart upload
@@ -71,5 +72,6 @@ def lambda_handler(event, _):
             "uploadID": upload_id,
             "totalPartsCount": total_parts_count,
             "objectKey": object_key,
+            "destObjectKey": dest_object_key,
         }
     }

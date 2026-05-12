@@ -45,10 +45,13 @@ if destination_prefix.endswith('/'):
 class MultiPartUploadHelper:
     """Base Class for multi-part upload helper"""
 
-    def __init__(self, upload_id: str, object_key: str):
+    def __init__(self, upload_id: str, object_key: str, dest_object_key: str = None):
         self.upload_id = upload_id
-        self.dest_object_key = f"{destination_prefix}/{object_key}" if destination_prefix else object_key
         self.object_key = object_key
+        if dest_object_key:
+            self.dest_object_key = dest_object_key
+        else:
+            self.dest_object_key = f"{destination_prefix}/{object_key}" if destination_prefix else object_key
         self.s3_client = self.create_s3_client()
 
     def create_s3_client(self):

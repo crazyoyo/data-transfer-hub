@@ -11,9 +11,10 @@ def lambda_handler(event, _):
     status = event["status"]
     upload_id = args.get("uploadID")
     object_key = args.get('objectKey')
+    dest_object_key = args.get('destObjectKey')
 
     multi_part_helper = MultiPartUploadHelper(
-        upload_id=upload_id, object_key=object_key)
+        upload_id=upload_id, object_key=object_key, dest_object_key=dest_object_key)
     etag = None
     if status == "COMPLETED":
         etag = multi_part_helper.complete_multipart_upload()
